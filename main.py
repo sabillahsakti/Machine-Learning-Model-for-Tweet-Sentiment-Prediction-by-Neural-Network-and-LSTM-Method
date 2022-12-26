@@ -1,6 +1,3 @@
-import re
-import string
-import json
 from flask import Flask, jsonify, request #import objects from the Flask model
 from flasgger import Swagger, LazyString, LazyJSONEncoder
 from flasgger import swag_from
@@ -16,6 +13,7 @@ from keras.models import load_model
 from keras.preprocessing.text import tokenizer_from_json
 from keras.utils.data_utils import pad_sequences
 
+#Memanggil fungsi yang ada di file proses.py
 from proses import process_csv_nn, process_csv_lstm, cleansing, pred_sentiment, pred
 
 app = Flask(__name__) #define app using Flask
@@ -82,10 +80,10 @@ def postFileNN():
         data = pd.read_csv(file, encoding='utf-8',error_bad_lines=False) 
     process_csv_nn(data)
     return "DONE"
-
+#=======================================================================================#
 #POST METHOD MODEL LSTM
 @swag_from("docs/post_text_lstm.yml", methods=['POST'])
-@app.route('/type', methods=['POST'])
+@app.route('/post_text_lstm', methods=['POST'])
 def type():
     string = str(request.form["text"])
     string = cleansing(string)
