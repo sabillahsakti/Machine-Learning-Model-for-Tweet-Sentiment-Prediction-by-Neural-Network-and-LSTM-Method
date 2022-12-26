@@ -1,5 +1,4 @@
 import re
-import string
 import json
 from flask import Flask, jsonify, request #import objects from the Flask model
 from flasgger import Swagger, LazyString, LazyJSONEncoder
@@ -26,6 +25,7 @@ kamusalay = pd.read_sql_query(query, db)
 kamusalay['hasil clean'] = kamusalay['hasil clean'].str.decode('utf-8')
 kamusalay['kata alay'] = kamusalay['kata alay'].str.decode('utf-8')
 
+#Mereplace kamus alay
 alay_dict_map = dict(zip(kamusalay['kata alay'], kamusalay['hasil clean']))
 def replace_kamus_alay(text):
     for word in alay_dict_map:
@@ -35,6 +35,7 @@ def replace_kamus_alay(text):
 def lower(text):
     return text.lower()
 
+#Hapus karakter pada text
 def hapuskarakter(text):
     text = re.sub('\n',' ', text)
     text = re.sub('rt',' ', text)
@@ -43,12 +44,14 @@ def hapuskarakter(text):
     text = re.sub('  +',' ', text)
     return text
 
+#Menjalankan semua proses cleansing
 def cleansing(text):
     text = lower(text)
     text = hapuskarakter(text)
     text = replace_kamus_alay(text)
     return text
 
+#PREDIKSI SENTIMEN UNTUK LSTM
 def pred_sentiment(string):
     with open('Model/tokenizer.json') as f:
         data = json.load(f)
@@ -66,6 +69,7 @@ def pred_sentiment(string):
 
     return classes[0]
 
+#MENENTUKAN KELAS HASIL PREDIKSI
 def pred(classes):
     hasil=""
     if classes[0] == classes.max():
@@ -78,6 +82,7 @@ def pred(classes):
         hasil = "positif"
         return hasil
 
+#PROSES UNTUK INPUT FILE NEURAL NETWORK
 def process_csv_nn(input_file):
     first_column = input_file.iloc[:, 0]
     print(first_column)
@@ -99,6 +104,7 @@ def process_csv_nn(input_file):
         db.commit()
         print(tweet)
 
+#PROSES UNTUK INPUT FILE LSTM
 def process_csv_lstm(input_file):
     first_column = input_file.iloc[:, 0]
     print(first_column)
